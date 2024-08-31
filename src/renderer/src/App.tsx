@@ -29,6 +29,7 @@ import ResourceCard from '@renderer/components/sider/resource-card'
 import UpdaterButton from '@renderer/components/updater/updater-button'
 import { useAppConfig } from './hooks/use-app-config'
 import { setNativeTheme } from './utils/ipc'
+import { platform } from './utils/init'
 
 const App: React.FC = () => {
   const { appConfig, patchAppConfig } = useAppConfig()
@@ -36,6 +37,7 @@ const App: React.FC = () => {
     appTheme = 'system',
     controlDns = true,
     controlSniff = true,
+    useWindowFrame = true,
     siderOrder = [
       'sysproxy',
       'tun',
@@ -108,7 +110,11 @@ const App: React.FC = () => {
       <div className="side w-[250px] h-full overflow-y-auto no-scrollbar">
         <div className="app-drag sticky top-0 z-40 backdrop-blur bg-background/40 h-[49px]">
           <div className="flex justify-between p-2">
-            <h3 className="text-lg font-bold leading-[32px]">Mihomo Party</h3>
+            <h3
+              className={`text-lg font-bold leading-[32px] ${!useWindowFrame && platform === 'darwin' ? 'invisible' : ''}`}
+            >
+              Mihomo Party
+            </h3>
             <UpdaterButton />
             <Button
               size="sm"

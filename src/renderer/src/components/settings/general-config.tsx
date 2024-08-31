@@ -10,6 +10,7 @@ import {
   disableAutoRun,
   enableAutoRun,
   isPortable,
+  relaunchApp,
   restartCore,
   setNativeTheme,
   setPortable
@@ -28,6 +29,7 @@ const GeneralConfig: React.FC = () => {
     useDockIcon = true,
     showTraffic = true,
     proxyInTray = true,
+    useWindowFrame = true,
     envType = platform === 'win32' ? 'powershell' : 'bash',
     autoCheckUpdate,
     appTheme = 'system'
@@ -172,6 +174,7 @@ const GeneralConfig: React.FC = () => {
             onSelectionChange={async (v) => {
               try {
                 await setPortable(v.currentKey === 'portable')
+                await relaunchApp()
               } catch (e) {
                 alert(e)
               } finally {
@@ -184,6 +187,16 @@ const GeneralConfig: React.FC = () => {
           </Select>
         </SettingItem>
       )}
+      <SettingItem title="使用系统标题栏" divider>
+        <Switch
+          size="sm"
+          isSelected={useWindowFrame}
+          onValueChange={async (v) => {
+            await patchAppConfig({ useWindowFrame: v })
+            await relaunchApp()
+          }}
+        />
+      </SettingItem>
       <SettingItem title="背景色" divider={appTheme !== 'system'}>
         <Tabs
           size="sm"

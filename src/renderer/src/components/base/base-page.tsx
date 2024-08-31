@@ -1,4 +1,6 @@
 import { Divider } from '@nextui-org/react'
+import { useAppConfig } from '@renderer/hooks/use-app-config'
+import { platform } from '@renderer/utils/init'
 import React, { forwardRef, useImperativeHandle, useRef } from 'react'
 interface Props {
   title?: React.ReactNode
@@ -8,6 +10,9 @@ interface Props {
 }
 
 const BasePage = forwardRef<HTMLDivElement, Props>((props, ref) => {
+  const { appConfig } = useAppConfig()
+  const { useWindowFrame = true } = appConfig || {}
+
   const contentRef = useRef<HTMLDivElement>(null)
   useImperativeHandle(ref, () => {
     return contentRef.current as HTMLDivElement
@@ -18,7 +23,11 @@ const BasePage = forwardRef<HTMLDivElement, Props>((props, ref) => {
       <div className="sticky top-0 z-40 h-[49px] w-full backdrop-blur bg-background/40">
         <div className="app-drag p-2 flex justify-between h-[48px]">
           <div className="title h-full text-lg leading-[32px]">{props.title}</div>
-          <div className="header h-full mr-[130px]">{props.header}</div>
+          <div
+            className={`header h-full ${!useWindowFrame && platform !== 'darwin' ? 'mr-[130px]' : ''}`}
+          >
+            {props.header}
+          </div>
         </div>
 
         <Divider />

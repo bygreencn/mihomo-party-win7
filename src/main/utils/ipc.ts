@@ -183,6 +183,10 @@ export function registerIpcMainHandlers(): void {
   ipcMain.handle('alert', (_e, msg) => {
     dialog.showErrorBox('Mihomo Party', msg)
   })
+  ipcMain.handle('relaunchApp', () => {
+    app.relaunch()
+    app.quit()
+  })
   ipcMain.handle('quitApp', () => app.quit())
 }
 

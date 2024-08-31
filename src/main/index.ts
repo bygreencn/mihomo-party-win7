@@ -103,7 +103,8 @@ app.whenReady().then(async () => {
     optimizer.watchWindowShortcuts(window)
   })
   registerIpcMainHandlers()
-  createWindow()
+  const { useWindowFrame = true } = await getAppConfig()
+  createWindow(useWindowFrame)
   await createTray()
   await initShortcut()
   app.on('activate', function () {
@@ -140,9 +141,9 @@ async function handleDeepLink(url: string): Promise<void> {
   }
 }
 
-export function createWindow(show = false): void {
+export function createWindow(useWindowFrame = true): void {
   Menu.setApplicationMenu(null)
-  // Create the browser window.
+
   const mainWindowState = windowStateKeeper({
     defaultWidth: 800,
     defaultHeight: 600
@@ -155,13 +156,19 @@ export function createWindow(show = false): void {
     x: mainWindowState.x,
     y: mainWindowState.y,
     show: false,
-    frame: false,
-    titleBarStyle: 'hidden',
-    titleBarOverlay: {
-      color: '#00000000',
-      symbolColor: '#8D8D8D',
-      height: 48
-    },
+    frame: useWindowFrame,
+    titleBarStyle: useWindowFrame ? 'default' : 'hidden',
+    titleBarOverlay: useWindowFrame
+      ? false
+      : process.platform === 'darwin'
+        ? {
+            height: 49
+          }
+        : {
+            color: '#00000000',
+            symbolColor: '#8D8D8D',
+            height: 49
+          },
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon: icon } : {}),
     webPreferences: {
@@ -173,7 +180,7 @@ export function createWindow(show = false): void {
   mainWindowState.manage(mainWindow)
   mainWindow.on('ready-to-show', async () => {
     const { silentStart } = await getAppConfig()
-    if (!silentStart || show) {
+    if (!silentStart) {
       mainWindow?.show()
       mainWindow?.focusOnWebView()
     }
@@ -210,7 +217,5 @@ export function showMainWindow(): void {
   if (mainWindow) {
     mainWindow.show()
     mainWindow.focusOnWebView()
-  } else {
-    createWindow(true)
   }
 }
